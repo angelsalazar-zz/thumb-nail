@@ -1,0 +1,75 @@
+<script>
+    HighlightBehavior = {
+      properties: {
+          hover:{
+            type:Boolean,
+            value: false,
+            reflectToAttribute:true,
+            notify:true
+          },
+          selected:{
+            type:Boolean,
+            value:false,
+            reflectToAttribute:true
+          }
+      },
+      listeners: {
+        mouseenter: '_addHightlight',
+        mouseleave: '_removeHighlight',
+        mousedown: '_handleSelection'
+      },
+      _addHightlight:function(){
+        var _sliders = this._getSliderParentElements();
+        this._setPropertyToSliderSwitchElementsByUID(_sliders,this.model.uid,'hover',true);
+        this.hover = true;
+      },
+      _removeHighlight:function(){
+        var _sliders = this._getSliderParentElements();
+        this._setPropertyToSliderSwitchElementsByUID(_sliders,this.model.uid,'hover',false);
+        this.hover = false;
+      },
+      _handleSelection:function(e){
+        var _sliders =  this._getSliderParentElements();
+        if(this.selected){
+          this._setPropertyToSliderSwitchElementsByUID(_sliders,this.model.uid,'isSelected',false);
+          this.selected = false;
+        }else{
+          this._setPropertyToSliderSwitchElementsByUID(_sliders,this.model.uid,'isSelected',true);
+          this.selected = true;
+        }
+      },
+      _getSliderParentElements:function(){
+        var _boxesWrapper = Polymer.dom(this).parentNode;
+        var _content = Polymer.dom(_boxesWrapper).parentNode;
+        var _paperHpMain = Polymer.dom(_content).parentNode;
+        var _paperDrawerPanel = Polymer.dom(_paperHpMain).parentNode;
+        return _paperDrawerPanel.querySelectorAll("slider-parent");
+      },
+      _setPropertyToSliderSwitchElementsByUID(sliders,modelUID,property,value){
+        for(var i=0;i<sliders.length;i++){
+          sliders[i].querySelector("slider-switch[uid='"+modelUID+"']").set(property,value);
+        }
+      }
+      // _handleSelected:function(e){
+      //     if(this.isSelected){
+      //         if(e.ctrlKey){
+      //             this.isSelected = false;
+      //             this.visibility = "none";
+      //         }
+      //     }else{
+      //         if(!e.ctrlKey){
+      //             var _children = Polymer.dom(Polymer.dom(this).parentNode).querySelectorAll("simple-el");
+      //             for (var i = 0; i < _children.length; i++) {
+      //                     if( _children[i].isSelected === true){
+      //                         _children[i].isSelected = false;
+      //                     }
+      //
+      //             }
+      //         }
+      //         this.isSelected = true;
+      //         this.visibility = "block";
+      //     }
+      // },
+
+    };
+</script>
