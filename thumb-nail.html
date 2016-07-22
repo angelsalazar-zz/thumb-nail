@@ -17,7 +17,7 @@
       box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
     }
     /* Hover when it's not selected, check for hover property */
-    :host[hover]{
+    :host[selecting]{
       box-shadow: 0 4px 8px 0 #1565C0, 0 6px 20px 0 #1565C0;
     }
     /* when selected, check for is-selected property  */
@@ -25,7 +25,7 @@
       box-shadow: 0 4px 8px 0 #FF9800, 0 6px 20px 0 #FF9800;
     }
     /* Hover when it's selected, check for hover and is-selected property */
-    :host[selected][hover]{
+    :host[selected][selecting]{
       box-shadow: 0 4px 8px 0 #B71C1C, 0 6px 20px 0 #B71C1C;
     }
     iron-image.thumbnail{

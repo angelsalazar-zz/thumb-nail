@@ -1,7 +1,7 @@
 <script>
     HighlightBehavior = {
       properties: {
-          hover:{
+          selecting:{
             type:Boolean,
             value: false,
             reflectToAttribute:true,
@@ -10,7 +10,14 @@
           selected:{
             type:Boolean,
             value:false,
-            reflectToAttribute:true
+            reflectToAttribute:true,
+            observer:'_setSelectToParameters',
+            notify:true
+          },
+          selectable:{
+            type:Boolean,
+            value:false,
+            reflectToAttribute: true
           }
       },
       listeners: {
@@ -18,58 +25,69 @@
         mouseleave: '_removeHighlight',
         mousedown: '_handleSelection'
       },
+      _setSelectToParameters:function(selected){
+        console.log(selected);
+        var _sliders = this._getSliderParentElements();
+        if(!selected){
+          this._setPropertyToSliderSwitchElementsByUID(_sliders,this.model.uid,'isSelected',false);
+        }else{
+          this._setPropertyToSliderSwitchElementsByUID(_sliders,this.model.uid,'isSelected',true);
+        }
+      },
       _addHightlight:function(){
         var _sliders = this._getSliderParentElements();
         this._setPropertyToSliderSwitchElementsByUID(_sliders,this.model.uid,'hover',true);
-        this.hover = true;
+        this.set('selecting', true);
       },
       _removeHighlight:function(){
         var _sliders = this._getSliderParentElements();
         this._setPropertyToSliderSwitchElementsByUID(_sliders,this.model.uid,'hover',false);
-        this.hover = false;
+        this.set('selecting', false);
       },
       _handleSelection:function(e){
-        var _sliders =  this._getSliderParentElements();
-        if(this.selected){
-          this._setPropertyToSliderSwitchElementsByUID(_sliders,this.model.uid,'isSelected',false);
-          this.selected = false;
-        }else{
-          this._setPropertyToSliderSwitchElementsByUID(_sliders,this.model.uid,'isSelected',true);
-          this.selected = true;
-        }
+        if(this.selectable){
+          //if thumb-nail clicked is selected
+          if(this.selected){
+            //if pressing CONTROL KEY
+            if(e.ctrlKey){
+              //if so, then thumb-nail clicked is deselected
+              this.set('selected',false);
+            }//end if e.crtlkey
+          }else{
+            //if not pressing CONTROL KEY when selecting, then deselect all the thumb-nail components
+            if(!e.ctrlKey){
+                var _selectableZone = Polymer.dom(this).parentNode;                                          //Query parent element
+                var _thumbNails = _selectableZone.queryAllEffectiveChildren('thumb-nail[selectable]')        //Query all thumb-nail compomenents
+                //foreach thumb-nail component
+                for(var i=0;i<_thumbNails.length;i++){
+                  //check if it's not selecting and selected
+                  if(!_thumbNails[i].selecting && _thumbNails[i].selected){
+                    //if so, then set selecting and selected to false
+                    _thumbNails[i].set('selecting',false);
+                    _thumbNails[i].set('selected',false);
+                  }
+                }
+              }
+              this.set('selected',true);                                                                    //thumb-nail clicked is selected
+          }//end else
+          e.stopPropagation(); //Avoid drag multiselection to be fired
+        }//end if selectable
+
       },
       _getSliderParentElements:function(){
-        var _boxesWrapper = Polymer.dom(this).parentNode;
-        var _content = Polymer.dom(_boxesWrapper).parentNode;
-        var _paperHpMain = Polymer.dom(_content).parentNode;
-        var _paperDrawerPanel = Polymer.dom(_paperHpMain).parentNode;
-        return _paperDrawerPanel.querySelectorAll("slider-parent");
+        var _selectableZone = Polymer.dom(this).parentNode;
+        var _content = Polymer.dom(_selectableZone).parentNode;
+        return _content.querySelectorAll("slider-parent");
+        //var _paperHpMain = Polymer.dom(_content).parentNode;
+        //var _paperDrawerPanel = Polymer.dom(_paperHpMain).parentNode;
+        //return _paperDrawerPanel.querySelectorAll("slider-parent");
       },
       _setPropertyToSliderSwitchElementsByUID(sliders,modelUID,property,value){
         for(var i=0;i<sliders.length;i++){
           sliders[i].querySelector("slider-switch[uid='"+modelUID+"']").set(property,value);
         }
       }
-      // _handleSelected:function(e){
-      //     if(this.isSelected){
-      //         if(e.ctrlKey){
-      //             this.isSelected = false;
-      //             this.visibility = "none";
-      //         }
-      //     }else{
-      //         if(!e.ctrlKey){
-      //             var _children = Polymer.dom(Polymer.dom(this).parentNode).querySelectorAll("simple-el");
-      //             for (var i = 0; i < _children.length; i++) {
-      //                     if( _children[i].isSelected === true){
-      //                         _children[i].isSelected = false;
-      //                     }
-      //
-      //             }
-      //         }
-      //         this.isSelected = true;
-      //         this.visibility = "block";
-      //     }
-      // },
+
 
     };
 </script>
